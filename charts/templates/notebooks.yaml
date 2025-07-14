@@ -1,0 +1,119 @@
+apiVersion: finops.krateo.io/v1
+kind: Notebook
+metadata:
+  name: query
+  labels:
+  {{- include "finops-notebooks.labels" . | nindent 4 }}
+spec: 
+  type: api
+  api: 
+    path: "/krateoplatformops/finops-database-handler/refs/tags/0.4.5/notebook_samples/query.py"
+    verb: GET
+    endpointRef:
+      name: {{ include "finops-notebooks.fullname" . }}
+      namespace: {{ .Release.Namespace }}
+---
+apiVersion: finops.krateo.io/v1
+kind: Notebook
+metadata:
+  name: costs
+  labels:
+  {{- include "finops-notebooks.labels" . | nindent 4 }}
+spec: 
+  type: api
+  api: 
+    path: "/krateoplatformops/finops-database-handler/refs/tags/0.4.5/notebook_samples/costs_frontend.py"
+    verb: GET
+    endpointRef:
+      name: {{ include "finops-notebooks.fullname" . }}
+      namespace: {{ .Release.Namespace }}
+---
+apiVersion: finops.krateo.io/v1
+kind: Notebook
+metadata:
+  name: allcosts
+  labels:
+  {{- include "finops-notebooks.labels" . | nindent 4 }}
+spec: 
+  type: api
+  api: 
+    path: "/krateoplatformops/finops-database-handler/refs/tags/0.4.5/notebook_samples/allcosts_dashboard.py"
+    verb: GET
+    endpointRef:
+      name: {{ include "finops-notebooks.fullname" . }}
+      namespace: {{ .Release.Namespace }}
+---
+apiVersion: finops.krateo.io/v1
+kind: Notebook
+metadata:
+  name: pricingparser
+  labels:
+  {{- include "finops-notebooks.labels" . | nindent 4 }}
+spec: 
+  type: api
+  api: 
+    path: "/krateoplatformops/finops-database-handler/refs/tags/0.4.5/notebook_samples/pricing_parser.py"
+    verb: GET
+    endpointRef:
+      name: {{ include "finops-notebooks.fullname" . }}
+      namespace: {{ .Release.Namespace }}
+---
+apiVersion: finops.krateo.io/v1
+kind: Notebook
+metadata:
+  name: pricingfrontend
+  labels:
+  {{- include "finops-notebooks.labels" . | nindent 4 }}
+spec: 
+  type: api
+  api: 
+    path: "/krateoplatformops/finops-database-handler/refs/tags/0.4.5/notebook_samples/pricing_frontend.py"
+    verb: GET
+    endpointRef:
+      name: {{ include "finops-notebooks.fullname" . }}
+      namespace: {{ .Release.Namespace }}
+---
+apiVersion: finops.krateo.io/v1
+kind: Notebook
+metadata:
+  name: metrics
+  labels:
+  {{- include "finops-notebooks.labels" . | nindent 4 }}
+spec: 
+  type: api
+  api: 
+    path: "/krateoplatformops/finops-database-handler/refs/tags/0.4.5/notebook_samples/metrics_frontend.py"
+    verb: GET
+    endpointRef:
+      name: {{ include "finops-notebooks.fullname" . }}
+      namespace: {{ .Release.Namespace }}
+---
+apiVersion: finops.krateo.io/v1
+kind: Notebook
+metadata:
+  name: costsbreakdown
+  labels:
+  {{- include "finops-notebooks.labels" . | nindent 4 }}
+spec: 
+  type: api
+  api: 
+    path: "/krateoplatformops/finops-database-handler/refs/tags/0.4.5/notebook_samples/costsbreakdown_frontend.py"
+    verb: GET
+    endpointRef:
+      name: {{ include "finops-notebooks.fullname" . }}
+      namespace: {{ .Release.Namespace }}
+---
+apiVersion: finops.krateo.io/v1
+kind: Notebook
+metadata:
+  name: cyclic
+  labels:
+  {{- include "finops-notebooks.labels" . | nindent 4 }}
+spec: 
+  type: api
+  api: 
+    path: "/krateoplatformops/finops-database-handler/refs/tags/0.4.5/notebook_samples/cyclic.py"
+    verb: GET
+    endpointRef:
+      name: {{ include "finops-notebooks.fullname" . }}
+      namespace: {{ .Release.Namespace }}

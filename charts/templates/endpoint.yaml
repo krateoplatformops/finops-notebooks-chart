@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "finops-notebooks.fullname" . }}
+  labels:
+  {{- include "finops-notebooks.labels" . | nindent 4 }}
+stringData:
+  server-url: https://raw.githubusercontent.com
