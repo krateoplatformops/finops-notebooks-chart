@@ -1,0 +1,78 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "finops-notebooks.fullname" . }}-cleanup
+  annotations:
+    "helm.sh/hook": post-delete
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": hook-succeeded
+  labels:
+  {{- include "finops-notebooks.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: {{ include "finops-notebooks.fullname" . }}-cleanup
+      containers:
+        - name: cleanup
+          image: ghcr.io/krateoplatformops/kubectl:1.33.1
+          command:
+            - sh
+            - -c
+          args:
+            - |
+              NOTEBOOK_NAMES="query costs allcosts pricingparser pricingfrontend metrics costsbreakdown cyclic"
+
+              FINALIZER="{{ include "finops-notebooks.finalizer" . }}"
+              SECRET_NAME="{{ include "finops-notebooks.fullname" . }}"
+              NAMESPACE="{{ .Release.Namespace }}"
+              
+              echo "Starting cleanup process..."
+              echo "Namespace: $NAMESPACE"
+              echo "Secret: $SECRET_NAME"
+              echo "Notebooks to check: $NOTEBOOK_NAMES"
+              
+              check_notebooks_deleted() {
+                for notebook in $NOTEBOOK_NAMES; do
+                  echo "Checking if notebook '$notebook' exists..."
+                  if kubectl get notebook "$notebook" -n "$NAMESPACE" >/dev/null 2>&1; then
+                    echo "Notebook '$notebook' still exists"
+                    return 1
+                  else
+                    echo "Notebook '$notebook' not found (good)"
+                  fi
+                done
+                return 0
+              }
+              
+              MAX_WAIT={{ .Values.deletionTimeout }}
+              WAIT_TIME=0
+              SLEEP_INTERVAL=5
+              
+              echo "Waiting for all notebooks to be deleted..."
+              while ! check_notebooks_deleted; do
+                if [ $WAIT_TIME -ge $MAX_WAIT ]; then
+                  echo "Timeout reached ($MAX_WAIT seconds). Some notebooks may still exist."
+                  echo "Proceeding with finalizer removal anyway..."
+                  break
+                fi
+                echo "Waiting ${SLEEP_INTERVAL}s for notebooks to be deleted... (${WAIT_TIME}s/${MAX_WAIT}s)"
+                sleep $SLEEP_INTERVAL
+                WAIT_TIME=$((WAIT_TIME + SLEEP_INTERVAL))
+              done
+              
+              echo "All notebooks are deleted or timeout reached. Proceeding with finalizer removal..."
+              
+              INDEX=$(kubectl get secret "$SECRET_NAME" -n "$NAMESPACE" -o json \
+                | jq ".metadata.finalizers | index(\"$FINALIZER\")")
+              
+              if [ "$INDEX" != "null" ]; then
+                echo "Removing finalizer '$FINALIZER' from secret '$SECRET_NAME'..."
+                kubectl patch secret "$SECRET_NAME" -n "$NAMESPACE" --type=json \
+                  -p="[{\"op\": \"remove\", \"path\": \"/metadata/finalizers/${INDEX}\"}]"
+                echo "Finalizer removed successfully"
+              else
+                echo "Finalizer $FINALIZER not found on secret $SECRET_NAME, nothing to do."
+              fi
+              
+              echo "Cleanup process completed"
