@@ -4,5 +4,7 @@ metadata:
   name: {{ include "finops-notebooks.fullname" . }}
   labels:
   {{- include "finops-notebooks.labels" . | nindent 4 }}
+  finalizers:
+    - {{ include "finops-notebooks.finalizer" . }}
 stringData:
   server-url: https://raw.githubusercontent.com
